@@ -1,16 +1,14 @@
 #!/bin/bash
 
-# Define title function for annotating the script
+# Define title function
 title() {
     local TITLE="${@}"
     let "TITLE_LENGTH = ${#TITLE} + 4"
     local TITLE_SEPARATOR="$(printf '#%.0s' $(seq ${TITLE_LENGTH}))"
-    printf "\n${TITLE_SEPARATOR}\n# ${TITLE} #\n${TITLE_SEPARATOR}\n"
-    echo
+    printf "\n${TITLE_SEPARATOR}\n# ${TITLE} #\n${TITLE_SEPARATOR}\n\n"
 }
 
-
-title "Install apt packages to Support HTTPS"
+title "Install HTTPS Support"
 apt-get update
 apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release
 
@@ -25,7 +23,10 @@ echo "Retrieving Docker Packages"
 apt-get update
 apt-get install -y docker-ce docker-ce-cli containerd.io
 
-echo "Verify Docker is installed correctly"
+echo "Adding vagrant user to docker group"
+usermod -a -G docker vagrant
+
+title "Verify Docker Is Installed Correctly"
 docker run hello-world
 if [  $? -eq 0  ]
 then
@@ -36,10 +37,7 @@ else
     exit 1
 fi
 
-echo "Adding vagrant user to docker group"
-usermod -a -G docker vagrant
-
-title "Update All Installed Packages"
+title "Upgrade All Installed Packages"
 apt update
 apt upgrade -y
 
